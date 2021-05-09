@@ -3,4 +3,4 @@
 
 
 
-`nmp create-react-app blog`
+`npm create-react-app blog`

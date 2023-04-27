@@ -18,3 +18,11 @@
 
 ##### `npx create-react-app your_app_name --template typescript`
 
+## React Functional component
+
+#### export default function
+# `rcf`
+
+# `rfce`
+
+

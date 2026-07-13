@@ -132,3 +132,64 @@ react read the dom and make a object reprsentaion vdom  and make a copy of origi
 
 eg. when we do \<Header /> then react create the object of the component
 
+### JSX to UI Journey
+
+Assume an comonent \<Search/>. whenever you call \<Search /> the the compnent object created again and again . by using this object react create a fibernode. Component object genereated again and again when you call Component like this\<Search/>. but the Fibernode check what is changesg. if nothing changeing then the fiibernode do nothing. if anything change fibenode goes to reactDOM. React has lifecycle, managing componenet and creating fibernode whereas Reactdom has the diffeng alg, ui changes ect
+
+we can write extpretion that return a value. we cannt write statement in jsx. also jsx look for first letter to distingush between Component and tag
+
+props are simply arguments passed to component.
+
+#### ESM brings export default fnName.  make \<script type='module' src='app.js'>
+
+it was indrduced in es6. it is a module system
+
+```JavaScript
+ // app2.js
+function geData() {
+  console.log('from module')
+}
+
+export default getData;
+```
+
+```HTML
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <body>
+    <script type='module' scr='app2.js'></script>
+    <script type='module'>
+      import getData form './app2.js';
+      getData();
+    </script>
+  </body>
+</html>
+```
+
+WebPack: package bundlers
+
+cobine all file sand make a file like single main.js in build.static/js
+
+npx is to run a comand, npm is to install a package
+
+loaders tells the webpack to how to treat diff ts or css files
+
+Entry ➔ Loaders ➔ Bundling ➔ plugins ➔ output
+
+CRA was old way to create react project
+
+Vite is new. no js file combination. as now module system is available in all bowrser. so it wll will break the js in two category. one is thta is not changeing. i.e nodemode. so vite make buid of those at one time. then what we change in our code then vite build that again in agian which make it fater then webpack. esbuild
+
+useRef ➔ react way of doing document.getElementById
+
+useState➔ 
+
+rerender means again and again function call. its not about the ui update again and again. if you don't have heavy calculation then no need to take tensio about  rerender
+
+react updates in batch but it was not in before versions. in react 18 we have the updates of the states in the batch
+
+<br />
+
+<br />
+

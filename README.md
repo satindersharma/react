@@ -193,3 +193,316 @@ react updates in batch but it was not in before versions. in react 18 we have th
 
 <br />
 
+Rerender means calling your component again with updated values
+
+```JSX
+const [c, setC] = useStae(0)
+
+setC(c+1) // this will now used
+setC(c+1) // 
+setC(c+1)
+
+//  take the snapshot values as they are prossing in batch
+// if you pass a function in the setter like this
+setC((prev) => prev + 1)
+setC((prev) => prev + 1)
+setC((prev) => prev + 1)
+// wen we use a callback funtion then the react use the reutrn value, now this new value will be pased to next call back function ,
+// there for we get new value
+setC(9)  // this is the replacement value
+setC(()=>{}) // this will use replacement value
+
+
+```
+
+##### setC(c+1) // setter function always pic state from the initial render
+
+| Initital | Que       | Return Value |
+| :------- | :-------- | :----------- |
+| 0        | setC(c+1) | discart      |
+| <br />   | setC(c+1) | discart      |
+| <br />   | setC(c+1) | discart      |
+
+##### with callback like this setC((prev) => prev + 1) .this will use return value
+
+| initial | Que                      | Return Value |
+| :------ | :----------------------- | :----------- |
+| 0       | setC((prev) => prev + 1) | 1            |
+| <br />  | setC((prev) => prev + 1) | 2            |
+| <br />  | setC((prev) => prev + 1) | 3            |
+
+### LIfecycle
+
+```JSX
+function Person() {
+  return <h1>person</h1>
+}
+
+<Person /> // => this is same like new Person() => react.createElement cals me
+// this will make it like a object
+const obj = {
+  type: h1, 
+  value: person
+}
+// this will compare with the original object. it anything change then this will update on UI
+
+// this will mount the component
+
+
+//  react incourage you to now not see the functional component in the as lifecycle. look it like Synchoroniztion 
+
+
+// useEffect
+
+
+useEffect(()=>{
+  console.log('Component Mounted.') // this will sheduled
+  return function () {
+    // cleanup funtion
+    console.log('unmouning ')
+  }
+}, [])
+
+// return will run and after the ui is shown then useEffect will run
+
+  // also if you have nested elements/ component, then the child will render first
+// how to unmount 
+  // using conditinal rendring
+
+
+```
+
+return will run and after the UI is shown then useEffect will run
+
+also if you have nested elements/ component, then the child will render first
+
+how to unmount
+
+using conditional rendring ( remember react will work condition rendering only on Boolean value. for react 0 is a valid value. it will render.
+
+on unmount first parent cleanup function will run then child and then its inner child
+
+<br />
+
+Stress testing. I f you run the react. at first it will do the stress testing means React Mounts and Remout Your Components. to check if you have properly implemented the useeffect cleanup 
+
+### \<React.StrictMode>. in this react will do these 3 thinks
+
+```JSX
+<React.StrictMode>
+  <App/>
+</React.StrictMode>
+```
+
+1. Re-Render Your Application
+2. useEffects  will call 2 times, first mounts then unmount and then mount
+3. if you are usign any outdated lib then react will show Depricated Warning /Errors
+
+Sometimes you need to run the useEffects only one time. 
+
+```JSX
+import './App.css'
+import {useState, useEffect} from 'react'
+
+let isFirstlaunch = true; // as this is outside of the functinop/Component so it is outside of the rerender cycle. 
+// that is why this will intiate once and will available with updated value after every component render/rerender
+ 
+function App(){
+  const [count, setCount] = useState(0);
+  useEffect(()=>{
+    console.log('Component Mounted'); //shedule
+    if(isFirstlaunch){ // do this if you are looking to call only once
+      isFirstlaunch = false;
+    showData(); // now this will call only once
+    }
+    return function(){
+      isFirstlaunch = false;
+      //  if you have any api call so make this flag false in your cleanup function also .
+      //  so that if api data will come in a delay then no action will perform
+      console.log('unmount')
+      
+    }
+  },[]);
+
+  function showData(){
+    console.log('getData')
+  }
+}
+```
+
+```JSX
+// other way to only call api once
+// by using AbortConrtoller
+
+
+import './App.css'
+import {useState, useEffect} from 'react'
+
+function App(){
+  const [count, setCount] = useState(0);
+  useEffect(()=>{
+    console.log('Component Mounted');
+    const controller = new AbortController();
+    const signal = controller.signal
+    fetch('apc', {signal:signal}).then()
+    showData(); // now this will call only once
+    }
+    return function(){
+      controller.abort(); // you will se the 2 requirest in network tab but this will abort the first reqest.
+      console.log('unmount')
+      
+    }
+  },[]);
+
+
+}
+```
+
+There is no lifecycle methods in react functional component. useeffect we used to syncronise your component with external data
+
+```JSX
+// pure function / same output for same input and not acceing outside variable or reference
+let x = 9
+function sum(a) {
+  return a + x // this is not a pure function
+}
+
+console.log(sum(2))
+console.log(sum(2))
+
+function sum(a) {
+  return 0 + x // this is a pure function
+}
+
+console.log(sum(2))
+console.log(sum(2))
+
+// is console.log is not pure function. as it is accing outside 
+console.log(x)// this is accing x
+
+function sum() {
+  // this is a pure function
+}
+
+console.log(sum(2))
+console.log(sum(2))
+
+function sum(a, b) {
+  return a + b // this is a pure function
+}
+
+console.log(sum(2,3))
+console.log(sum(2,3))
+
+function sum(a, b) {
+  return a + b + 2 // this is a pure function
+}
+
+function sum(a, b) {
+  return a + b + 2 + x  // this is not a pure function
+  // because it is accessign a variable that is not in its own scope
+}
+
+// pure function make it more debugable or testable,
+// so everyone should try to write a pure function
+
+```
+
+UseEfffect ➔ what is effect anything that accing outside the react world. we use the useeffect when we are going to communicate with outside the react world. axios, fetch call, evenlistner, localstorage, browserapi socket connection
+
+useeffect will call in the same order how you are written in file
+
+##### 3 flavours of ueEffect
+
+```JSX
+// 3 flavours of ueEffect
+useEffect(()=>{}})
+// call this effect on every state change
+// syncronize my component from outside world on every state change
+
+useEffect(()=>{}}, [])
+// call this effect once, when my component Mounts
+// syncronize my component from outside world  when my component Mounts
+
+useEffect(()=>{}}, [someVariable])
+// call this effect once, when my component Mounts and 
+// whenever the reactive variable passed in dependcy array changes
+
+// syncronize my component from outside world  when my component Mounts and 
+// whenever the reactive variable passed in dependcy array changes
+
+// warning
+
+// the below one is dangrous when we have some state change in it like this
+useEffect(()=>{
+  setState(); / will cause an infinite loop
+}})
+
+
+// also cleanup will call on unmount and  if thre is any dependency reactive variable, then it will be called on change/update of reactive varable
+```
+
+<br />
+
+```CSS
+/* // /component/my-component/style.css */
+.your-component{
+  
+}
+```
+
+```JavaScript
+// /component/my-component/utils.js
+
+// if a funtion is only related to compeoonent then add over here otherwise  src/utils
+export function getData(){
+  
+}
+```
+
+```JavaScript
+// /component/my-component/constant.js
+export DEFAULT_AGE = 18;
+```
+
+```JSX
+// file structure
+// /component/my-component/index.js
+
+import React from 'react'; //first should be the third party libratires
+import React from 'react'; //first should be the third party libratires
+import React from 'react'; //first should be the third party libratires
+// a gap
+import {getData} from './utils'; // then your function
+
+const {DEFAULT_AGE} from './constant'; // your constant
+
+import './style.css' // then your styles
+
+
+function YourComponent(props) {
+  const {} = props; // first line props destructure
+
+  // redux data
+
+  // useState call
+
+  // custom hooks call
+
+  // useeffects. all useeffects at one place
+
+  // yours functions
+
+  // variables drived from state. eg
+  const message = `${score} hello ` 
+
+  
+
+  
+  return <div className='your-component'></div>
+}
+
+```
+
+useEffect and useState
+
